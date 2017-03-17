@@ -1,6 +1,7 @@
 package nl.macmannes.biedermeier
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -33,6 +34,18 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         behaviours.forEach { if (it is OnBeforeCreateBehaviour) it.onCreate(savedInstanceState) }
         super.onCreate(savedInstanceState)
         behaviours.forEach { if (it is OnCreateBehaviour) it.onCreate(savedInstanceState) }
+    }
+
+    @CallSuper
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        behaviours.forEach { if (it is OnPostCreateBehaviour) it.onPostCreate(savedInstanceState) }
+    }
+
+    @CallSuper
+    override fun onStart() {
+        super.onStart()
+        behaviours.forEach { if (it is OnStartBehaviour) it.onStart() }
     }
 
     @CallSuper
