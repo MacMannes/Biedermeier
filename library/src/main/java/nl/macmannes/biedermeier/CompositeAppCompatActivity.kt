@@ -3,6 +3,7 @@ package nl.macmannes.biedermeier
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 
 /**
  * Created by andre on 01-03-17.
@@ -34,11 +35,21 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         behaviours.forEach { if (it is OnCreateBehaviour) it.onCreate(savedInstanceState) }
     }
 
-
     @CallSuper
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         behaviours.forEach { if (it is OnRequestPermissionsResultBehaviour) it.onRequestPermissionsResult(requestCode, permissions, grantResults) }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var handled = false
+        behaviours.forEach {
+            if (it is OnOptionsItemSelectedBehaviour && !handled) {
+                handled = it.onOptionsItemSelected(item)
+            }
+        }
+
+        return if (handled) handled else super.onOptionsItemSelected(item)
     }
 
     //endregion
