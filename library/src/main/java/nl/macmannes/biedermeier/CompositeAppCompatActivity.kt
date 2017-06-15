@@ -48,6 +48,16 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         behaviours.forEach { if (it is OnStartBehaviour) it.onStart() }
     }
 
+    override fun onPause() {
+        super.onPause()
+        behaviours.forEach { if (it is OnPauseBehaviour) it.onPause() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        behaviours.forEach { if (it is OnResumeBehaviour) it.onResume() }
+    }
+
     @CallSuper
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
