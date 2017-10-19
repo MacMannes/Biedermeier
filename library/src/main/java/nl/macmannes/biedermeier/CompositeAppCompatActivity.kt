@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.view.MenuItem
 
 /**
@@ -24,44 +25,44 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
 
     @CallSuper
     override fun onDestroy() {
-        behaviours.forEach { if (it is OnDestroyBehaviour) it.onDestroy() }
+        behaviours.forEach { (it as? OnDestroyBehaviour)?.onDestroy() }
         removeBehaviours()
         super.onDestroy()
     }
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
-        behaviours.forEach { if (it is OnBeforeCreateBehaviour) it.onCreate(savedInstanceState) }
+        behaviours.forEach { (it as? OnBeforeCreateBehaviour)?.onCreate(savedInstanceState) }
         super.onCreate(savedInstanceState)
-        behaviours.forEach { if (it is OnCreateBehaviour) it.onCreate(savedInstanceState) }
+        behaviours.forEach { (it as? OnCreateBehaviour)?.onCreate(savedInstanceState) }
     }
 
     @CallSuper
     override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onPostCreate(savedInstanceState, persistentState)
-        behaviours.forEach { if (it is OnPostCreateBehaviour) it.onPostCreate(savedInstanceState) }
+        behaviours.forEach { (it as? OnPostCreateBehaviour)?.onPostCreate(savedInstanceState) }
     }
 
     @CallSuper
     override fun onStart() {
         super.onStart()
-        behaviours.forEach { if (it is OnStartBehaviour) it.onStart() }
+        behaviours.forEach { (it as? OnStartBehaviour)?.onStart() }
     }
 
     override fun onPause() {
         super.onPause()
-        behaviours.forEach { if (it is OnPauseBehaviour) it.onPause() }
+        behaviours.forEach { (it as? OnPauseBehaviour)?.onPause() }
     }
 
     override fun onResume() {
         super.onResume()
-        behaviours.forEach { if (it is OnResumeBehaviour) it.onResume() }
+        behaviours.forEach { (it as? OnResumeBehaviour)?.onResume() }
     }
 
     @CallSuper
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        behaviours.forEach { if (it is OnRequestPermissionsResultBehaviour) it.onRequestPermissionsResult(requestCode, permissions, grantResults) }
+        behaviours.forEach { (it as? OnRequestPermissionsResultBehaviour)?.onRequestPermissionsResult(requestCode, permissions, grantResults) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -73,6 +74,18 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         }
 
         return if (handled) handled else super.onOptionsItemSelected(item)
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        var handled = false
+
+        behaviours.forEach {
+            if (it is DispatchKeyEventBehaviour && !handled) {
+                handled = it.dispatchKeyEvent(event)
+            }
+        }
+
+        return if (handled) handled else super.dispatchKeyEvent(event)
     }
 
     //endregion
