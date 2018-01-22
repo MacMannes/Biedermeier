@@ -2,7 +2,6 @@ package nl.macmannes.biedermeier
 
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -23,27 +22,23 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
 
     //region Behaviours
 
-    @CallSuper
     override fun onDestroy() {
         behaviours.forEach { (it as? OnDestroyBehaviour)?.onDestroy() }
         removeBehaviours()
         super.onDestroy()
     }
 
-    @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         behaviours.forEach { (it as? OnBeforeCreateBehaviour)?.onCreate(savedInstanceState) }
         super.onCreate(savedInstanceState)
         behaviours.forEach { (it as? OnCreateBehaviour)?.onCreate(savedInstanceState) }
     }
 
-    @CallSuper
     override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onPostCreate(savedInstanceState, persistentState)
         behaviours.forEach { (it as? OnPostCreateBehaviour)?.onPostCreate(savedInstanceState) }
     }
 
-    @CallSuper
     override fun onStart() {
         super.onStart()
         behaviours.forEach { (it as? OnStartBehaviour)?.onStart() }
@@ -59,7 +54,6 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         behaviours.forEach { (it as? OnResumeBehaviour)?.onResume() }
     }
 
-    @CallSuper
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         behaviours.forEach { (it as? OnRequestPermissionsResultBehaviour)?.onRequestPermissionsResult(requestCode, permissions, grantResults) }
@@ -86,6 +80,20 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         }
 
         return if (handled) handled else super.dispatchKeyEvent(event)
+    }
+
+    override fun onBackPressed() {
+        var handled = false
+
+        behaviours.forEach {
+            if (it is OnBackPressedBehaviour && !handled) {
+                handled = it.onBackPressed()
+            }
+        }
+
+        if (!handled) {
+            super.onBackPressed()
+        }
     }
 
     //endregion
