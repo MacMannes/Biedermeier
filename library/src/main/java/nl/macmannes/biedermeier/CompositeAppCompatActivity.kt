@@ -54,6 +54,16 @@ open class CompositeAppCompatActivity : AppCompatActivity() {
         behaviours.forEach { (it as? OnResumeBehaviour)?.onResume() }
     }
 
+    override fun onStop() {
+        super.onStop()
+        behaviours.forEach { (it as? OnStopBehaviour)?.onStop() }
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        behaviours.forEach { (it as? OnLowMemoryBehaviour)?.onLowMemory() }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         behaviours.forEach { (it as? OnRequestPermissionsResultBehaviour)?.onRequestPermissionsResult(requestCode, permissions, grantResults) }
